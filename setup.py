@@ -6,6 +6,7 @@ from setuptools.command.sdist import sdist
 from io import open
 from tempfile import gettempdir
 import pkg_resources
+import site
 import subprocess
 import os
 import sys
@@ -56,7 +57,7 @@ class InstallBase():
 
     def get_virtualenv_path(self):
         """Used to work out path to install compiled binaries to."""
-        return os.path.join(sys.prefix, 'bin')
+        return os.path.join(site.USER_BASE or sys.prefix, 'bin')
 
     def download_mseedindex(self):
         # download mseed index zip ball
@@ -82,6 +83,8 @@ class InstallBase():
         subprocess.check_call(cmd, cwd=mseedindex_path, shell=True)
         mseedindex_binary = os.path.join(mseedindex_path, 'mseedindex')
         mseedindex_binary_dest = self.get_mseedindex_path()
+        if not os.path.isdir(mseedindex_binary_dest):
+            os.makedirs(mseedindex_binary_dest)
         shutil.copy(mseedindex_binary, mseedindex_binary_dest)
         return mseedindex_binary_dest
 
